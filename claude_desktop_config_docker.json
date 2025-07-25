@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "weather": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "--init",
+        "-e",
+        "NODE_ENV=production, OPENWEATHER_API_KEY='example'",
+        "denhamparry/mcp-weather"
+      ]
+    }
+  }
+}
