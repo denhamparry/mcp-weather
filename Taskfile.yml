@@ -1,0 +1,54 @@
+version: "3"
+
+vars:
+  IMAGE_NAME: mcp-weather
+  IMAGE_TAG: latest
+  REGISTRY: docker.io
+  REGISTRY_USER: '{{.REGISTRY_USER | default "edera-dev"}}'
+
+tasks:
+  build:
+    desc: Build the Docker image
+    cmds:
+      - docker build -t {{.IMAGE_NAME}}:{{.IMAGE_TAG}} .
+      - docker tag {{.IMAGE_NAME}}:{{.IMAGE_TAG}}
+        {{.REGISTRY}}/{{.REGISTRY_USER}}/{{.IMAGE_NAME}}:{{.IMAGE_TAG}}
+    silent: false
+
+  push:
+    desc: Push the Docker image to registry
+    deps: [build]
+    cmds:
+      - docker push
+        {{.REGISTRY}}/{{.REGISTRY_USER}}/{{.IMAGE_NAME}}:{{.IMAGE_TAG}}
+    silent: false
+    preconditions:
+      - sh: '[ -n "$REGISTRY_USER" ]'
+        msg: "Please set REGISTRY_USER environment variable"
+
+  run:
+    desc: Run the Docker container
+    cmds:
+      - docker run -it --rm -e OPENWEATHER_API_KEY={{.OPENWEATHER_API_KEY}}
+        {{.IMAGE_NAME}}:{{.IMAGE_TAG}}
+    silent: false
+    preconditions:
+      - sh: '[ -n "$OPENWEATHER_API_KEY" ]'
+        msg: "Please set OPENWEATHER_API_KEY environment variable"
+
+  run-compose:
+    desc: Run the Docker container using docker-compose
+    cmds:
+      - docker-compose run --rm mcp-weather
+    silent: false
+    preconditions:
+      - sh: '[ -n "$OPENWEATHER_API_KEY" ]'
+        msg: "Please set OPENWEATHER_API_KEY environment variable"
+
+  clean:
+    desc: Remove the Docker image
+    cmds:
+      - docker rmi {{.IMAGE_NAME}}:{{.IMAGE_TAG}} || true
+      - docker rmi
+        {{.REGISTRY}}/{{.REGISTRY_USER}}/{{.IMAGE_NAME}}:{{.IMAGE_TAG}} || true
+    silent: false

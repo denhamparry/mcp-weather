@@ -1,0 +1,9 @@
+version: "3.8"
+
+services:
+  mcp-weather:
+    build: .
+    environment:
+      - OPENWEATHER_API_KEY=${OPENWEATHER_API_KEY}
+    stdin_open: true
+    tty: true

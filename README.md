@@ -47,6 +47,51 @@ Get weather alerts for a location using latitude and longitude coordinates.
 npm run build
 ```
 
+## Docker
+
+### Build the Docker image
+
+```bash
+docker build -t mcp-weather .
+```
+
+### Run with Docker Compose (recommended)
+
+```bash
+# Set your API key and run
+OPENWEATHER_API_KEY="your_api_key_here" docker-compose run --rm mcp-weather
+```
+
+### Run with Docker directly
+
+```bash
+docker run -it --rm -e OPENWEATHER_API_KEY="your_api_key_here" mcp-weather
+```
+
+The container runs the MCP server which communicates via stdio. Make sure to run
+it in interactive mode (`-it`) to enable proper communication.
+
+### Using Task (task runner)
+
+If you have [Task](https://taskfile.dev/) installed, you can use these commands:
+
+```bash
+# Build the Docker image
+task build
+
+# Push to Docker registry (requires REGISTRY_USER env var)
+REGISTRY_USER=your-dockerhub-username task push
+
+# Run the container (requires OPENWEATHER_API_KEY env var)
+OPENWEATHER_API_KEY="your_api_key_here" task run
+
+# Run with docker-compose
+OPENWEATHER_API_KEY="your_api_key_here" task run-compose
+
+# Clean up Docker images
+task clean
+```
+
 ## Test
 
 To test Cardiff weather functionality:
