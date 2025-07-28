@@ -82,44 +82,57 @@ Inspector:
 
 ## Docker
 
-### Build the Docker image
+The project provides two Docker configurations:
+
+- `Dockerfile.stdio`: For standard MCP server with stdio communication
+- `Dockerfile.http`: For HTTP-based MCP server
+
+### Build Docker images
 
 ```bash
-docker build -t mcp-weather .
+# Build stdio version
+docker build -f Dockerfile.stdio -t mcp-weather:stdio .
+
+# Build HTTP version
+docker build -f Dockerfile.http -t mcp-weather:http .
 ```
 
 ### Run with Docker Compose (recommended)
 
 ```bash
-# Set your API key and run
+# Set your API key and run stdio version
 OPENWEATHER_API_KEY="your_api_key_here" docker-compose run --rm mcp-weather
 ```
 
 ### Run with Docker directly
 
 ```bash
-docker run -it --rm -e OPENWEATHER_API_KEY="your_api_key_here" mcp-weather
+# Run stdio version (standard MCP server)
+docker run -it --rm -e OPENWEATHER_API_KEY="your_api_key_here" mcp-weather:stdio
+
+# Run HTTP version (web server on port 3000)
+docker run -p 3000:3000 --rm -e OPENWEATHER_API_KEY="your_api_key_here" mcp-weather:http
 ```
 
-The container runs the MCP server which communicates via stdio. Make sure to run
-it in interactive mode (`-it`) to enable proper communication.
+The stdio container runs the MCP server which communicates via stdio. Make sure
+to run it in interactive mode (`-it`) to enable proper communication.
+
+The HTTP container runs a web server on port 3000 for testing with MCP
+Inspector.
 
 ### Using Task (task runner)
 
 If you have [Task](https://taskfile.dev/) installed, you can use these commands:
 
 ```bash
-# Build the Docker image
-task build
+# Build both Docker images (requires REGISTRY_USER env var)
+REGISTRY_USER=your-dockerhub-username task build
 
-# Push to Docker registry (requires REGISTRY_USER env var)
-REGISTRY_USER=your-dockerhub-username task push
+# Run stdio version (requires OPENWEATHER_API_KEY env var)
+OPENWEATHER_API_KEY="your_api_key_here" task run-stdio
 
-# Run the container (requires OPENWEATHER_API_KEY env var)
-OPENWEATHER_API_KEY="your_api_key_here" task run
-
-# Run with docker-compose
-OPENWEATHER_API_KEY="your_api_key_here" task run-compose
+# Run HTTP version (requires OPENWEATHER_API_KEY env var)
+OPENWEATHER_API_KEY="your_api_key_here" task run-http
 
 # Clean up Docker images
 task clean
