@@ -104,6 +104,74 @@ export OPENWEATHER_API_KEY="your_api_key_here"
 npm test
 ```
 
+## HTTP Transport for Kubernetes
+
+For Kubernetes deployments, the server supports HTTP transport using the MCP Streamable HTTP specification. This enables Claude Desktop to connect to the server running in a Kubernetes cluster.
+
+### Running HTTP Server Locally
+
+```bash
+# Set your API key and start the HTTP server
+export OPENWEATHER_API_KEY="your_api_key_here"
+npm run start:http
+```
+
+The server will be available at `http://localhost:3000`.
+
+### Claude Desktop Configuration for HTTP
+
+Use the `claude_desktop_config_http.json` configuration file:
+
+```json
+{
+  "mcpServers": {
+    "weather": {
+      "transport": {
+        "type": "http",
+        "url": "http://localhost:3000"
+      },
+      "env": {
+        "NODE_ENV": "production"
+      }
+    }
+  }
+}
+```
+
+For Kubernetes deployments, replace `localhost:3000` with your ingress URL.
+
+### Kubernetes Deployment
+
+The Kubernetes manifests in the `kubernetes/` directory include:
+
+- **Deployment**: Runs the HTTP server with health checks
+- **Service**: Exposes the server within the cluster
+- **Ingress**: Makes the server accessible from outside the cluster
+- **Secret**: Stores the OpenWeatherMap API key
+
+Deploy with:
+
+```bash
+# Create namespace
+kubectl create namespace mcp-weather
+
+# Create secret with your API key
+kubectl create secret generic mcp-weather-secrets \
+  --from-literal=api-key="your_api_key_here" \
+  -n mcp-weather
+
+# Apply all manifests
+kubectl apply -k kubernetes/
+```
+
+### Health Checks
+
+The HTTP server includes a `/health` endpoint for Kubernetes health probes:
+
+```bash
+curl http://localhost:3000/health
+```
+
 ## Note
 
 This server uses the OpenWeatherMap API which provides weather data for

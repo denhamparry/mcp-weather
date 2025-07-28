@@ -4,7 +4,8 @@
   "description": "An mcp server to answer weather conditions",
   "main": "index.js",
   "scripts": {
-    "build": "tsc && chmod 755 build/index.js",
+    "build": "tsc && chmod 755 build/index.js && chmod 755 build/http-server.js",
+    "start:http": "npm run build && node build/http-server.js",
     "test": "npm run build && node --test test/*.test.js",
     "test:unit": "npm run build && node --test test/*.test.js",
     "test:integration": "node test-cardiff.js",

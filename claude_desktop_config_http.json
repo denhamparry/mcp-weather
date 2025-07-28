@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "weather": {
+      "transport": {
+        "type": "http",
+        "url": "http://localhost:3000"
+      },
+      "env": {
+        "NODE_ENV": "production"
+      }
+    }
+  }
+}

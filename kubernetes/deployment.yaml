@@ -26,8 +26,20 @@ spec:
                   key: api-key
           ports:
             - containerPort: 3000
-              name: mcp
+              name: http
               protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
           resources:
             requests:
               memory: "128Mi"
