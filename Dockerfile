@@ -30,9 +30,6 @@ RUN npm ci --only=production
 # Copy built application from builder stage
 COPY --from=builder /app/build ./build
 
-# The application expects OPENWEATHER_API_KEY environment variable
-ENV OPENWEATHER_API_KEY=""
-
 # Run as non-root user
 USER node
 
