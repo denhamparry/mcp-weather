@@ -47,6 +47,39 @@ Get weather alerts for a location using latitude and longitude coordinates.
 npm run build
 ```
 
+## HTTP Server
+
+To run the MCP server as an HTTP service for local testing:
+
+```bash
+# Build and start the HTTP server
+npm run build && node build/http.js
+```
+
+The server will start on port 3000. You can then test it using the MCP
+Inspector:
+
+1. Install MCP Inspector globally:
+
+   ```bash
+   npm install -g @modelcontextprotocol/inspector
+   ```
+
+2. Open MCP Inspector and connect to your HTTP server:
+
+   ```bash
+   mcp-inspector
+   ```
+
+3. In the inspector interface:
+
+   - Select "HTTP" as the transport type
+   - Enter `http://localhost:3000/mcp` as the URL
+   - Click "Connect"
+
+4. You can now test the `get_forecast` and `get_alerts` tools with UK
+   coordinates directly in the inspector interface.
+
 ## Docker
 
 ### Build the Docker image
