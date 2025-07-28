@@ -1,10 +1,17 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
+import {
+  makeOpenWeatherRequest,
+  formatAlert,
+  formatForecastItems,
+  type WeatherAlert,
+  type AlertsResponse,
+  type ForecastResponse,
+  type ForecastItem,
+} from "./weather-utils.js";
 
 const OPENWEATHER_API_BASE = "https://api.openweathermap.org/data/2.5";
-const USER_AGENT = "weather-app/1.0";
-const API_KEY = process.env.OPENWEATHER_API_KEY;
 
 // Create server instance
 const server = new McpServer({
@@ -15,98 +22,6 @@ const server = new McpServer({
     tools: {},
   },
 });
-
-// Helper function for making OpenWeatherMap API requests
-async function makeOpenWeatherRequest<T>(url: string): Promise<T | null> {
-  if (!API_KEY) {
-    console.error(
-      "OpenWeatherMap API key not found. Please set OPENWEATHER_API_KEY environment variable."
-    );
-    return null;
-  }
-
-  const headers = {
-    "User-Agent": USER_AGENT,
-  };
-
-  try {
-    const response = await fetch(url, { headers });
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    return (await response.json()) as T;
-  } catch (error) {
-    console.error("Error making OpenWeatherMap request:", error);
-    return null;
-  }
-}
-
-interface WeatherAlert {
-  id: string;
-  sender_name: string;
-  event: string;
-  start: number;
-  end: number;
-  description: string;
-  tags: string[];
-}
-
-// Format alert data
-function formatAlert(alert: WeatherAlert): string {
-  const startDate = new Date(alert.start * 1000).toLocaleString();
-  const endDate = new Date(alert.end * 1000).toLocaleString();
-  return [
-    `Event: ${alert.event}`,
-    `Sender: ${alert.sender_name}`,
-    `Start: ${startDate}`,
-    `End: ${endDate}`,
-    `Description: ${alert.description}`,
-    `Tags: ${alert.tags.join(", ")}`,
-    "---",
-  ].join("\n");
-}
-
-interface WeatherMain {
-  temp: number;
-  feels_like: number;
-  temp_min: number;
-  temp_max: number;
-  pressure: number;
-  humidity: number;
-}
-
-interface WeatherCondition {
-  id: number;
-  main: string;
-  description: string;
-  icon: string;
-}
-
-interface Wind {
-  speed: number;
-  deg: number;
-  gust?: number;
-}
-
-interface ForecastItem {
-  dt: number;
-  main: WeatherMain;
-  weather: WeatherCondition[];
-  wind: Wind;
-  dt_txt: string;
-}
-
-interface AlertsResponse {
-  alerts?: WeatherAlert[];
-}
-
-interface ForecastResponse {
-  list: ForecastItem[];
-  city: {
-    name: string;
-    country: string;
-  };
-}
 
 // Register weather tools
 server.tool(
@@ -121,7 +36,7 @@ server.tool(
       .describe("Longitude of the location"),
   },
   async ({ latitude, longitude }) => {
-    const alertsUrl = `${OPENWEATHER_API_BASE}/onecall?lat=${latitude}&lon=${longitude}&appid=${API_KEY}&exclude=minutely,hourly,daily,current`;
+    const alertsUrl = `${OPENWEATHER_API_BASE}/onecall?lat=${latitude}&lon=${longitude}&appid=${process.env.OPENWEATHER_API_KEY}&exclude=minutely,hourly,daily,current`;
     const alertsData = await makeOpenWeatherRequest<AlertsResponse>(alertsUrl);
 
     if (!alertsData) {
@@ -176,7 +91,7 @@ server.tool(
   },
   async ({ latitude, longitude }) => {
     // Get 5-day weather forecast
-    const forecastUrl = `${OPENWEATHER_API_BASE}/forecast?lat=${latitude}&lon=${longitude}&appid=${API_KEY}&units=metric`;
+    const forecastUrl = `${OPENWEATHER_API_BASE}/forecast?lat=${latitude}&lon=${longitude}&appid=${process.env.OPENWEATHER_API_KEY}&units=metric`;
     const forecastData = await makeOpenWeatherRequest<ForecastResponse>(
       forecastUrl
     );
@@ -205,30 +120,7 @@ server.tool(
     }
 
     // Format forecast periods (show next 8 periods to cover about 24 hours)
-    const formattedForecast = forecasts
-      .slice(0, 8)
-      .map((forecast: ForecastItem) => {
-        const date = new Date(forecast.dt * 1000);
-        const windDirection = forecast.wind.deg ? `${forecast.wind.deg}°` : "";
-        const windSpeed = forecast.wind.speed
-          ? `${forecast.wind.speed} m/s`
-          : "Unknown";
-        const gustInfo = forecast.wind.gust
-          ? ` (gusts: ${forecast.wind.gust} m/s)`
-          : "";
-
-        return [
-          `${date.toLocaleString()}:`,
-          `Temperature: ${Math.round(
-            forecast.main.temp
-          )}°C (feels like ${Math.round(forecast.main.feels_like)}°C)`,
-          `Conditions: ${forecast.weather[0]?.description || "Unknown"}`,
-          `Wind: ${windSpeed} ${windDirection}${gustInfo}`,
-          `Humidity: ${forecast.main.humidity}%`,
-          `Pressure: ${forecast.main.pressure} hPa`,
-          "---",
-        ].join("\n");
-      });
+    const formattedForecast = formatForecastItems(forecasts, 8);
 
     const locationName = forecastData.city
       ? `${forecastData.city.name}, ${forecastData.city.country}`
