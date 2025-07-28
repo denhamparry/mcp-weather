@@ -1,0 +1,15 @@
+node_modules/
+.git/
+.gitignore
+*.md
+.env
+.env.*
+test/
+tests/
+coverage/
+.nyc_output/
+*.log
+kubernetes/
+src/
+tsconfig.json
+package-lock.json
