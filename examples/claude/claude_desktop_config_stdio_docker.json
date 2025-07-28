@@ -8,8 +8,10 @@
         "--rm",
         "--init",
         "-e",
-        "NODE_ENV=production, OPENWEATHER_API_KEY='example'",
-        "denhamparry/mcp-weather"
+        "NODE_ENV=production",
+        "-e",
+        "OPENWEATHER_API_KEY=example",
+        "denhamparry/mcp-weather:latest-stdio"
       ]
     }
   }
