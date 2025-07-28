@@ -5,8 +5,10 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc && chmod 755 build/index.js",
-    "test": "node test-cardiff.js",
-    "test:dry": "echo \"To run Cardiff weather test, set OPENWEATHER_API_KEY and run 'npm test'\""
+    "test": "npm run build && node --test test/*.test.js",
+    "test:unit": "npm run build && node --test test/*.test.js",
+    "test:integration": "node test-cardiff.js",
+    "test:dry": "echo \"To run Cardiff weather test, set OPENWEATHER_API_KEY and run 'npm run test:integration'\""
   },
   "repository": {
     "type": "git",
