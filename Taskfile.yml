@@ -10,10 +10,13 @@ tasks:
   build:
     desc: Build the Docker image
     cmds:
-      - docker build -t {{.IMAGE_NAME}}:{{.IMAGE_TAG}} .
-      - docker tag {{.IMAGE_NAME}}:{{.IMAGE_TAG}}
-        {{.REGISTRY}}/{{.REGISTRY_USER}}/{{.IMAGE_NAME}}:{{.IMAGE_TAG}}
+      - docker buildx build --platform linux/amd64,linux/arm64
+        -t  {{.REGISTRY}}/{{.REGISTRY_USER}}/{{.IMAGE_NAME}}:{{.IMAGE_TAG}}
+        --push .
     silent: false
+    preconditions:
+      - sh: '[ -n "$REGISTRY_USER" ]'
+        msg: "Please set REGISTRY_USER environment variable"
 
   push:
     desc: Push the Docker image to registry

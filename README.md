@@ -77,7 +77,7 @@ If you have [Task](https://taskfile.dev/) installed, you can use these commands:
 
 ```bash
 # Build the Docker image
-task build
+REGISTRY_USER=your-dockerhub-username task build
 
 # Push to Docker registry (requires REGISTRY_USER env var)
 REGISTRY_USER=your-dockerhub-username task push

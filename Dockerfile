@@ -37,4 +37,5 @@ ENV OPENWEATHER_API_KEY=""
 USER node
 
 # The MCP server uses stdio for communication
-ENTRYPOINT ["node", "./build/index.js"]
+# Use TCP wrapper for Kubernetes deployment
+ENTRYPOINT ["node", "./build/tcp-wrapper.js"]

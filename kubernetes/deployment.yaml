@@ -16,8 +16,8 @@ spec:
     spec:
       containers:
         - name: mcp-weather
-          image: mcp-weather:latest
-          imagePullPolicy: IfNotPresent
+          image: denhamparry/mcp-weather:latest
+          imagePullPolicy: Always
           env:
             - name: OPENWEATHER_API_KEY
               valueFrom:

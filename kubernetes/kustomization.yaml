@@ -9,5 +9,5 @@ resources:
   - secret.yaml
 
 images:
-  - name: mcp-weather
+  - name: denhamparry/mcp-weather
     newTag: latest
