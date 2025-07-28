@@ -1,0 +1,37 @@
+services:
+  mcp-weather-tailscale:
+    image: tailscale/tailscale:latest
+    container_name: mcp-weather-tailscale
+    ports:
+      # This line makes mcp-weather available at port 3000 of the device you run the container on,
+      # i.e. http://localhost:3000/mcp
+      - "3000:3000"
+    hostname: mcp-weather
+    environment:
+      - TS_AUTHKEY=${TAILSCALE_AUTH_KEY}?ephemeral=false
+      - TS_EXTRA_ARGS=--advertise-tags=tag:container --reset
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_USERSPACE=false
+      - TS_SERVE_CONFIG=/config/serve.json
+    volumes:
+      - ${PWD}/config:/config
+      - ts-authkey-test:/var/lib/tailscale
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    restart: unless-stopped
+  mcp-weather-http:
+    image: denhamparry/mcp-weather:latest-http
+    network_mode: service:mcp-weather-tailscale
+    environment:
+      - OPENWEATHER_API_KEY=${OPENWEATHER_API_KEY}
+    volumes:
+      - ts-authkey-test:/var/lib/tailscale:ro
+    restart: unless-stopped
+    pull_policy: always
+volumes:
+  ts-authkey-test:
+    driver: local
+  mcp-weather-http:
+    driver: local
