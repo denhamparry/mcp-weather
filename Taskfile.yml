@@ -47,7 +47,8 @@ tasks:
     desc: Run the Docker container with stdio transport support
     cmds:
       - docker run -it --rm -e OPENWEATHER_API_KEY={{.OPENWEATHER_API_KEY}}
-        {{.IMAGE_NAME}}:{{.IMAGE_TAG}}
+        --name {{.IMAGE_NAME}}-stdio -d
+        {{.REGISTRY}}/{{.REGISTRY_USER}}/{{.IMAGE_NAME}}:{{.IMAGE_TAG}}
     silent: false
     preconditions:
       - sh: '[ -n "$OPENWEATHER_API_KEY" ]'
@@ -57,20 +58,20 @@ tasks:
     desc: Run the Docker container with streamable HTTP transport support
     cmds:
       - docker run -it --rm -e OPENWEATHER_API_KEY={{.OPENWEATHER_API_KEY}}
-        {{.IMAGE_NAME}}:{{.IMAGE_TAG}}-http
+        --name {{.IMAGE_NAME}}-http -d -p 3000:3000
+        {{.REGISTRY}}/{{.REGISTRY_USER}}/{{.IMAGE_NAME}}:{{.IMAGE_TAG}}-http
     silent: false
 
-  docker-clean:
-    desc: Remove the Docker image
+  docker-stop-stdio:
+    desc: Stop the Docker container with stdio transport support
     cmds:
-      - docker rmi {{.IMAGE_NAME}}:{{.IMAGE_TAG}}-stdio || true
-      - docker rmi {{.IMAGE_NAME}}:{{.IMAGE_TAG}}-http || true
-      - docker rmi
-        {{.REGISTRY}}/{{.REGISTRY_USER}}/{{.IMAGE_NAME}}:{{.IMAGE_TAG}}-stdio ||
-        true
-      - docker rmi
-        {{.REGISTRY}}/{{.REGISTRY_USER}}/{{.IMAGE_NAME}}:{{.IMAGE_TAG}}-http ||
-        true
+      - docker stop {{.IMAGE_NAME}}-stdio
+    silent: false
+
+  docker-stop-http:
+    desc: Stop the Docker container with streamable HTTP transport support
+    cmds:
+      - docker stop {{.IMAGE_NAME}}-http
     silent: false
 
   kubernetes-apply:
