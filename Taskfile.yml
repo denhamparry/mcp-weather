@@ -85,6 +85,17 @@ tasks:
       - sh: '[ -n "$OPENWEATHER_API_KEY" ]'
         msg: "Please set OPENWEATHER_API_KEY environment variable"
 
+  kubernetes-apply-edera:
+    desc: Spin up MCP on a Kubernetes Cluster
+    cmds:
+      - kubectl create secret generic openweather-api-key
+        --from-literal=OPENWEATHER_API_KEY="{{.OPENWEATHER_API_KEY}}"
+      - kubectl apply -f kubernetes/pod-edera.yaml
+      - kubectl apply -f kubernetes/service.yaml
+    preconditions:
+      - sh: '[ -n "$OPENWEATHER_API_KEY" ]'
+        msg: "Please set OPENWEATHER_API_KEY environment variable"
+
   kubernetes-port-forward:
     desc: Connect to the remote MCP server
     cmds:
