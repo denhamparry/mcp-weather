@@ -47,38 +47,73 @@ Get weather alerts for a location using latitude and longitude coordinates.
 npm run build
 ```
 
-## HTTP Server
+## HTTP Server with OAuth Authentication
 
-To run the MCP server as an HTTP service for local testing:
+The HTTP server now includes Auth0 OAuth authentication for secure access to the MCP endpoints.
 
-```bash
-# Build and start the HTTP server
-npm run build && node build/http.js
-```
+### Quick Setup
 
-The server will start on port 3000. You can then test it using the MCP
-Inspector:
+1. **Configure Auth0** (see [AUTH0_SETUP.md](AUTH0_SETUP.md) for detailed instructions):
+   - Create an Auth0 application
+   - Set callback URL to `http://localhost:3000/callback`
+   - Copy your domain, client ID, and client secret
 
-1. Install MCP Inspector globally:
+2. **Set environment variables**:
+   ```bash
+   cp .env.example .env
+   # Edit .env with your Auth0 credentials and OpenWeatherMap API key
+   ```
 
+3. **Build and start the server**:
+   ```bash
+   npm run build && node build/http.js
+   ```
+
+The server will start on port 3000 with OAuth protection enabled.
+
+### Authentication Flow
+
+1. Visit `http://localhost:3000` to see server status
+2. Go to `http://localhost:3000/login` to authenticate with Auth0
+3. After successful login, access your profile at `http://localhost:3000/profile`
+4. The `/mcp` endpoint is now accessible for authenticated requests
+
+### Testing with MCP Inspector
+
+You can test the authenticated MCP endpoint using the MCP Inspector:
+
+1. **Authenticate first**: Visit `http://localhost:3000/login` in your browser and complete the Auth0 login
+
+2. **Install MCP Inspector**:
    ```bash
    npm install -g @modelcontextprotocol/inspector
    ```
 
-2. Open MCP Inspector and connect to your HTTP server:
-
+3. **Start MCP Inspector**:
    ```bash
    mcp-inspector
    ```
 
-3. In the inspector interface:
-
+4. **Connect to the authenticated endpoint**:
    - Select "HTTP" as the transport type
    - Enter `http://localhost:3000/mcp` as the URL
    - Click "Connect"
 
-4. You can now test the `get_forecast` and `get_alerts` tools with UK
-   coordinates directly in the inspector interface.
+5. You can now test the `get_forecast` and `get_alerts` tools with UK coordinates directly in the inspector interface.
+
+**Note**: The MCP Inspector will use your browser's session cookies for authentication, so make sure you're logged in first.
+
+### Available Endpoints
+
+| Endpoint | Method | Auth Required | Description |
+|----------|--------|---------------|-------------|
+| `/` | GET | No | Server info and authentication status |
+| `/login` | GET | No | Login page or initiate Auth0 login |
+| `/callback` | GET | No | Auth0 callback handler |
+| `/logout` | GET | No | Logout and redirect to Auth0 logout |
+| `/profile` | GET | Yes | User profile information |
+| `/mcp` | POST | Yes | MCP protocol endpoint |
+| `/health` | GET | No | Health check |
 
 ## Docker
 
