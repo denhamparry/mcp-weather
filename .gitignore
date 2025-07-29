@@ -140,3 +140,9 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+.editorconfig
+.markdownlint-cli2.jsonc
+.pre-commit-config.yaml
+.prettierrc
+.shellcheckrc
