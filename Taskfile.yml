@@ -11,11 +11,11 @@ tasks:
     desc: Build the Docker images
     cmds:
       - docker buildx build --platform linux/amd64,linux/arm64 -f
-        Dockerfile.stdio
+        Docker/Dockerfile.stdio
         -t  {{.REGISTRY}}/{{.REGISTRY_USER}}/{{.IMAGE_NAME}}:{{.IMAGE_TAG}}-stdio
         --push .
       - docker buildx build --platform linux/amd64,linux/arm64 -f
-        Dockerfile.http
+        Docker/Dockerfile.http
         -t  {{.REGISTRY}}/{{.REGISTRY_USER}}/{{.IMAGE_NAME}}:{{.IMAGE_TAG}}-http
         --push .
     silent: false
