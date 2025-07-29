@@ -34,4 +34,4 @@ COPY --from=builder /app/build ./build
 USER node
 
 # The MCP server uses stdio for communication
-ENTRYPOINT ["node", "./build/http.js"]
+ENTRYPOINT ["node", "--watch", "./build/http.js"]
