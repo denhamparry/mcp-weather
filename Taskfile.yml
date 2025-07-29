@@ -17,14 +17,14 @@ tasks:
     desc: Run the project as a standard MCP server
     deps: [build]
     cmds:
-      - node build/index.js
+      - OPENWEATHER_API_KEY={{.OPENWEATHER_API_KEY}} node build/index.js
     silent: false
 
   run-http:
     desc: Run the project as an HTTP server
     deps: [build]
     cmds:
-      - node build/http.js
+      - OPENWEATHER_API_KEY={{.OPENWEATHER_API_KEY}} node build/http.js
     silent: false
 
   docker-build:
