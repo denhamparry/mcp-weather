@@ -14,7 +14,7 @@ services:
       - TS_USERSPACE=false
       - TS_SERVE_CONFIG=/config/serve.json
     volumes:
-      - ./config:/config
+      - ../Tailscale/config:/config
       - ts-authkey-test:/var/lib/tailscale
       - /dev/net/tun:/dev/net/tun
     cap_add:
