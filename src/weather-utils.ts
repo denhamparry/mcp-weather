@@ -53,9 +53,12 @@ export interface ForecastResponse {
 const USER_AGENT = "weather-app/1.0";
 
 // Helper function for making OpenWeatherMap API requests
-export async function makeOpenWeatherRequest<T>(url: string, apiKey?: string): Promise<T | null> {
+export async function makeOpenWeatherRequest<T>(
+  url: string,
+  apiKey?: string
+): Promise<T | null> {
   const API_KEY = apiKey || process.env.OPENWEATHER_API_KEY;
-  
+
   if (!API_KEY) {
     console.error(
       "OpenWeatherMap API key not found. Please set OPENWEATHER_API_KEY environment variable."
@@ -107,9 +110,9 @@ export function formatForecastItem(forecast: ForecastItem): string {
 
   return [
     `${date.toLocaleString()}:`,
-    `Temperature: ${Math.round(
-      forecast.main.temp
-    )}°C (feels like ${Math.round(forecast.main.feels_like)}°C)`,
+    `Temperature: ${Math.round(forecast.main.temp)}°C (feels like ${Math.round(
+      forecast.main.feels_like
+    )}°C)`,
     `Conditions: ${forecast.weather[0]?.description || "Unknown"}`,
     `Wind: ${windSpeed} ${windDirection}${gustInfo}`,
     `Humidity: ${forecast.main.humidity}%`,
@@ -119,8 +122,9 @@ export function formatForecastItem(forecast: ForecastItem): string {
 }
 
 // Format multiple forecast items
-export function formatForecastItems(forecasts: ForecastItem[], count: number = 8): string[] {
-  return forecasts
-    .slice(0, count)
-    .map(formatForecastItem);
+export function formatForecastItems(
+  forecasts: ForecastItem[],
+  count: number = 8
+): string[] {
+  return forecasts.slice(0, count).map(formatForecastItem);
 }
