@@ -8,6 +8,26 @@ vars:
 
 tasks:
   build:
+    desc: Build the project
+    cmds:
+      - npm install && npm run build
+    silent: false
+
+  run-stdio:
+    desc: Run the project as a standard MCP server
+    deps: [build]
+    cmds:
+      - node build/index.js
+    silent: false
+
+  run-http:
+    desc: Run the project as an HTTP server
+    deps: [build]
+    cmds:
+      - node build/http.js
+    silent: false
+
+  docker-build:
     desc: Build the Docker images
     cmds:
       - docker buildx build --platform linux/amd64,linux/arm64 -f
@@ -23,7 +43,7 @@ tasks:
       - sh: '[ -n "$REGISTRY_USER" ]'
         msg: "Please set REGISTRY_USER environment variable"
 
-  run-stdio:
+  docker-run-stdio:
     desc: Run the Docker container with stdio transport support
     cmds:
       - docker run -it --rm -e OPENWEATHER_API_KEY={{.OPENWEATHER_API_KEY}}
@@ -33,14 +53,14 @@ tasks:
       - sh: '[ -n "$OPENWEATHER_API_KEY" ]'
         msg: "Please set OPENWEATHER_API_KEY environment variable"
 
-  run-http:
+  docker-run-http:
     desc: Run the Docker container with streamable HTTP transport support
     cmds:
       - docker run -it --rm -e OPENWEATHER_API_KEY={{.OPENWEATHER_API_KEY}}
         {{.IMAGE_NAME}}:{{.IMAGE_TAG}}-http
     silent: false
 
-  clean:
+  docker-clean:
     desc: Remove the Docker image
     cmds:
       - docker rmi {{.IMAGE_NAME}}:{{.IMAGE_TAG}}-stdio || true
@@ -52,21 +72,6 @@ tasks:
         {{.REGISTRY}}/{{.REGISTRY_USER}}/{{.IMAGE_NAME}}:{{.IMAGE_TAG}}-http ||
         true
     silent: false
-
-  docker-compose-up:
-    desc: Run docker compose up from the Docker directory
-    cmds:
-      - docker compose -f Docker/docker-compose.yaml up -d
-    preconditions:
-      - sh: '[ -n "$OPENWEATHER_API_KEY" ]'
-        msg: "Please set OPENWEATHER_API_KEY environment variable"
-      - sh: '[ -n "$TAILSCALE_AUTH_KEY" ]'
-        msg: "Please set TAILSCALE_AUTH_KEY environment variable"
-
-  docker-compose-down:
-    desc: Stop and remove docker compose containers
-    cmds:
-      - docker compose -f Docker/docker-compose.yaml down
 
   kubernetes-apply:
     desc: Spin up MCP on a Kubernetes Cluster
