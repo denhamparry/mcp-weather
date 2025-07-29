@@ -12,6 +12,9 @@ API.
    export OPENWEATHER_API_KEY="your_api_key_here"
    ```
 
+> You can also set the environment variable in the `.envrc` file and use
+> [direnv](https://direnv.net/) to load it automatically.
+
 ## Usage
 
 This server provides two tools:
@@ -41,13 +44,26 @@ Get weather alerts for a location using latitude and longitude coordinates.
 - `latitude`: Latitude of the location (-90 to 90)
 - `longitude`: Longitude of the location (-180 to 180)
 
+> This project uses [Task](https://taskfile.dev/) to build and run the project.
+> You can install it with `brew install task`.
+
 ## Build
 
 ```bash
-npm run build
+npm install && npm run build
 ```
 
-## HTTP Server
+## Run
+
+### Stdio
+
+To run the MCP server as a standard MCP server:
+
+```bash
+node build/index.js
+```
+
+### HTTP Server
 
 To run the MCP server as an HTTP service for local testing:
 
@@ -59,25 +75,19 @@ npm run build && node build/http.js
 The server will start on port 3000. You can then test it using the MCP
 Inspector:
 
-1. Install MCP Inspector globally:
+1. Run MCP Inspector locally:
 
    ```bash
-   npm install -g @modelcontextprotocol/inspector
+   npx @modelcontextprotocol/inspector
    ```
 
-2. Open MCP Inspector and connect to your HTTP server:
-
-   ```bash
-   mcp-inspector
-   ```
-
-3. In the inspector interface:
+2. In the inspector interface:
 
    - Select "HTTP" as the transport type
    - Enter `http://localhost:3000/mcp` as the URL
    - Click "Connect"
 
-4. You can now test the `get_forecast` and `get_alerts` tools with UK
+3. You can now test the `get_forecast` and `get_alerts` tools with UK
    coordinates directly in the inspector interface.
 
 ## Docker
@@ -96,23 +106,6 @@ docker build -f Docker/Dockerfile.stdio -t mcp-weather:stdio .
 # Build HTTP version
 docker build -f Docker/Dockerfile.http -t mcp-weather:http .
 ```
-
-### Run with Docker Compose
-
-The project includes a Docker Compose configuration with Tailscale integration
-for secure networking:
-
-<!-- markdownlint-disable MD013 -->
-
-```bash
-# Run the HTTP version with Tailscale (from project root)
-OPENWEATHER_API_KEY="your_api_key_here" TAILSCALE_AUTH_KEY="your_tailscale_key" docker compose -f Docker/docker-compose.yaml up -d
-
-# Stop the services
-docker compose -f Docker/docker-compose.yaml down
-```
-
-<!-- markdownlint-enable MD013 -->
 
 ### Run with Docker directly
 
@@ -144,12 +137,6 @@ OPENWEATHER_API_KEY="your_api_key_here" task run-stdio
 
 # Run HTTP version locally (requires OPENWEATHER_API_KEY env var)
 OPENWEATHER_API_KEY="your_api_key_here" task run-http
-
-# Run with Docker Compose and Tailscale
-OPENWEATHER_API_KEY="your_api_key_here" TAILSCALE_AUTH_KEY="your_key" task docker-compose-up
-
-# Stop Docker Compose services
-task docker-compose-down
 
 # Clean up Docker images
 task clean
@@ -230,7 +217,7 @@ Once deployed, you can:
 
 ## Test
 
-To test Cardiff weather functionality:
+To test weather functionality:
 
 ```bash
 # Set your API key first
