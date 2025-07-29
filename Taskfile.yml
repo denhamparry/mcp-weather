@@ -67,3 +67,24 @@ tasks:
     desc: Stop and remove docker compose containers
     cmds:
       - docker compose -f Docker/docker-compose.yaml down
+
+  kubernetes-apply:
+    desc: Spin up MCP on a Kubernetes Cluster
+    cmds:
+      - kubectl create secret generic openweather-api-key
+        --from-literal=OPENWEATHER_API_KEY="{{.OPENWEATHER_API_KEY}}"
+      - kubectl apply -f kubernetes/pod.yaml
+      - kubectl apply -f kubernetes/service.yaml
+    preconditions:
+      - sh: '[ -n "$OPENWEATHER_API_KEY" ]'
+        msg: "Please set OPENWEATHER_API_KEY environment variable"
+
+  kubernetes-port-forward:
+    desc: Connect to the remote MCP server
+    cmds:
+      - kubectl port-forward svc/mcp-weather 3000:3000
+
+  kubernetes-delete:
+    desc: Delete MCP from a Kubernetes Cluster
+    cmds:
+      - kubectl delete -f kubernetes/

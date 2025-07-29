@@ -155,6 +155,79 @@ task docker-compose-down
 task clean
 ```
 
+## Kubernetes
+
+The project includes Kubernetes manifests for deploying the MCP server in a
+Kubernetes cluster. The deployment uses the HTTP variant for easier
+connectivity.
+
+### Kubernetes Resources
+
+The `kubernetes/` directory contains:
+
+- `pod.yaml`: Pod definition for the MCP weather server
+- `service.yaml`: ClusterIP service to expose the pod internally
+- `secret.yaml`: Example secret for the OpenWeatherMap API key
+
+### Deploy to Kubernetes
+
+#### Using Task (recommended)
+
+```bash
+# Deploy the MCP server with your API key
+OPENWEATHER_API_KEY="your_api_key_here" task kubernetes-apply
+
+# Port forward to access the service locally
+task kubernetes-port-forward
+
+# Clean up the deployment
+task kubernetes-delete
+```
+
+#### Using kubectl directly
+
+```bash
+# Create the secret with your API key
+kubectl create secret generic openweather-api-key \
+  --from-literal=OPENWEATHER_API_KEY="your_api_key_here"
+
+# Apply the Kubernetes manifests
+kubectl apply -f kubernetes/
+
+# Port forward to access the service (runs on localhost:3000)
+kubectl port-forward svc/mcp-weather 3000:3000
+
+# Delete the deployment when done
+kubectl delete -f kubernetes/
+```
+
+### Accessing the Service
+
+Once deployed, you can:
+
+1. **Port forward** to test locally:
+
+   ```bash
+   kubectl port-forward svc/mcp-weather 3000:3000
+   ```
+
+   Then access the MCP server at `http://localhost:3000/mcp`
+
+2. **Test with MCP Inspector**:
+
+   ```bash
+   npx @modelcontextprotocol/inspector
+   ```
+
+   Connect to `http://localhost:3000/mcp` while port forwarding is active
+
+### Kubernetes Configuration Notes
+
+- The pod uses the `denhamparry/mcp-weather:latest-http` image
+- API key is stored as a Kubernetes secret for security
+- Service exposes port 3000 internally within the cluster
+- Pod has `imagePullPolicy: Always` to ensure latest image is used
+
 ## Test
 
 To test Cardiff weather functionality:
