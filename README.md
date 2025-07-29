@@ -84,17 +84,17 @@ Inspector:
 
 The project provides two Docker configurations:
 
-- `Dockerfile.stdio`: For standard MCP server with stdio communication
-- `Dockerfile.http`: For HTTP-based MCP server
+- `Docker/Dockerfile.stdio`: For standard MCP server with stdio communication
+- `Docker/Dockerfile.http`: For HTTP-based MCP server
 
 ### Build Docker images
 
 ```bash
 # Build stdio version
-docker build -f Dockerfile.stdio -t mcp-weather:stdio .
+docker build -f Docker/Dockerfile.stdio -t mcp-weather:stdio .
 
 # Build HTTP version
-docker build -f Dockerfile.http -t mcp-weather:http .
+docker build -f Docker/Dockerfile.http -t mcp-weather:http .
 ```
 
 ### Run with Docker Compose (recommended)
