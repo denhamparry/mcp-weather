@@ -52,3 +52,18 @@ tasks:
         {{.REGISTRY}}/{{.REGISTRY_USER}}/{{.IMAGE_NAME}}:{{.IMAGE_TAG}}-http ||
         true
     silent: false
+
+  docker-compose-up:
+    desc: Run docker compose up from the Docker directory
+    cmds:
+      - docker compose -f Docker/docker-compose.yaml up -d
+    preconditions:
+      - sh: '[ -n "$OPENWEATHER_API_KEY" ]'
+        msg: "Please set OPENWEATHER_API_KEY environment variable"
+      - sh: '[ -n "$TAILSCALE_AUTH_KEY" ]'
+        msg: "Please set TAILSCALE_AUTH_KEY environment variable"
+
+  docker-compose-down:
+    desc: Stop and remove docker compose containers
+    cmds:
+      - docker compose -f Docker/docker-compose.yaml down
