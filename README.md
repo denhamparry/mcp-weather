@@ -97,12 +97,22 @@ docker build -f Docker/Dockerfile.stdio -t mcp-weather:stdio .
 docker build -f Docker/Dockerfile.http -t mcp-weather:http .
 ```
 
-### Run with Docker Compose (recommended)
+### Run with Docker Compose
+
+The project includes a Docker Compose configuration with Tailscale integration
+for secure networking:
+
+<!-- markdownlint-disable MD013 -->
 
 ```bash
-# Set your API key and run stdio version
-OPENWEATHER_API_KEY="your_api_key_here" docker-compose run --rm mcp-weather
+# Run the HTTP version with Tailscale (from project root)
+OPENWEATHER_API_KEY="your_api_key_here" TAILSCALE_AUTH_KEY="your_tailscale_key" docker compose -f Docker/docker-compose.yaml up -d
+
+# Stop the services
+docker compose -f Docker/docker-compose.yaml down
 ```
+
+<!-- markdownlint-enable MD013 -->
 
 ### Run with Docker directly
 
@@ -125,14 +135,21 @@ Inspector.
 If you have [Task](https://taskfile.dev/) installed, you can use these commands:
 
 ```bash
-# Build both Docker images (requires REGISTRY_USER env var)
+# Build and push both Docker images to registry (requires REGISTRY_USER env var)
+# Note: This pushes to docker.io/REGISTRY_USER/mcp-weather:latest-stdio and :latest-http
 REGISTRY_USER=your-dockerhub-username task build
 
-# Run stdio version (requires OPENWEATHER_API_KEY env var)
+# Run stdio version locally (requires OPENWEATHER_API_KEY env var)
 OPENWEATHER_API_KEY="your_api_key_here" task run-stdio
 
-# Run HTTP version (requires OPENWEATHER_API_KEY env var)
+# Run HTTP version locally (requires OPENWEATHER_API_KEY env var)
 OPENWEATHER_API_KEY="your_api_key_here" task run-http
+
+# Run with Docker Compose and Tailscale
+OPENWEATHER_API_KEY="your_api_key_here" TAILSCALE_AUTH_KEY="your_key" task docker-compose-up
+
+# Stop Docker Compose services
+task docker-compose-down
 
 # Clean up Docker images
 task clean
@@ -149,6 +166,13 @@ export OPENWEATHER_API_KEY="your_api_key_here"
 # Run the Cardiff weather test
 npm test
 ```
+
+## Examples
+
+The `examples/` directory contains configuration examples for:
+
+- Claude Code integration (`examples/claude code/`)
+- Claude Desktop integration (`examples/claude desktop/`)
 
 ## Note
 
