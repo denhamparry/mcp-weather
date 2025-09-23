@@ -2,7 +2,10 @@
   "mcpServers": {
     "weather": {
       "command": "/run/current-system/sw/bin/node",
-      "args": ["/Users/lewis/git/denhamparry/mcp-weather/build/http.js"],
+      "args": [
+        "--watch",
+        "/Users/lewis/git/denhamparry/mcp-weather/build/http.js"
+      ],
       "env": {
         "NODE_ENV": "production",
         "OPENWEATHER_API_KEY": "example"
