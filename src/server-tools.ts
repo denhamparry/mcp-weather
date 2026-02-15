@@ -14,10 +14,6 @@ export function createWeatherServer(): McpServer {
   const server = new McpServer({
     name: "weather",
     version: "1.0.0",
-    capabilities: {
-      resources: {},
-      tools: {},
-    },
   });
 
   registerWeatherTools(server);
